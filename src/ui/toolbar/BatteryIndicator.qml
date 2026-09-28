@@ -28,6 +28,8 @@ Item {
 
     property bool showIndicator: true
 
+    property real last_gas_values: [0,0,0,0,0,0,0,0,0,0];
+
     property var _activeVehicle: QGroundControl.multiVehicleManager.activeVehicle
 
     Row {
@@ -103,6 +105,33 @@ Item {
                 return ""
             }
 
+            function getGasolinePercentage() {
+                var value = NaN
+
+                if (!isNaN(battery.percentRemaining.rawValue)) {
+                    value = battery.percentRemaining.rawValue
+                } else if (!isNaN(battery.voltage.rawValue)) {
+                    value = battery.voltage.rawValue
+                } else if (battery.chargeState.rawValue !== MAVLink.MAV_BATTERY_CHARGE_STATE_UNDEFINED) {
+                    return battery.chargeState.enumStringValue
+                } else {
+                    return ""
+                }
+
+                last_gas_values.push(value)
+                if (last_gas_values.length > 10) {
+                    last_gas_values.shift()
+                }
+                var sum = 0
+                for (var i = 0; i < last_gas_values.length; i++) {
+                    sum += last_gas_values[i]
+                }
+                var average = sum / last_gas_values.length
+                return average.toFixed(1) + "%"
+            }
+
+
+
             QGCColoredImage {
                 anchors.top:        parent.top
                 anchors.bottom:     parent.bottom
@@ -136,7 +165,7 @@ Item {
                 text:{
                         switch (battery.id.rawValue) {
                         case 3:
-                            return getBatteryPercentageText()
+                            return getGasolinePercentage()
                         default:
                             return getBatteryTensionText()
                         }

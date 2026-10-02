@@ -32,7 +32,8 @@ ApplicationWindow {
 
     property SiYiCamera siYiCamera: SiYi.camera
     property var versao_software: "Versão 1.0.0_SRT"//"Versão 0.9.2"
-
+    property bool checklistVerified: false
+    property bool reportGenerated: false
     Component.onCompleted: {
         //-- Full screen on mobile or tiny screens
         if (ScreenTools.isMobile || Screen.height / ScreenTools.realPixelDensity < 120) {
@@ -449,6 +450,29 @@ ApplicationWindow {
                             if (!mainWindow.preventViewSwitch()) {
                                 toolSelectDialog.hideDialog()
                                 mainWindow.showSettingsTool()
+                            }
+                        }
+                    }
+
+                    SubMenuButton {
+                        id:                 checklistButton
+                        height:             _toolButtonHeight
+                        Layout.fillWidth:   true
+                        text:               checklistVerified? qsTr("Finalizer Operação") : qsTr("Pre-Flight Checklist")
+                        imageResource:      "/qmlimages/Armed.svg"
+                        imageColor:         qgcPal.text
+
+                        onClicked: {
+                            if (!checklistVerified){
+
+                                    toolSelectDialog.hideDialog()
+                                    PreFlightChecklist.requestChecklist()
+                                    checklistVerified = true
+
+                            }
+                            else{
+                                PreFlightChecklist.finalizeOperation(PreFlightChecklist.checklistFile)
+                                checklistVerified = false
                             }
                         }
                     }

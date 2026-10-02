@@ -64,6 +64,7 @@
 #include "FlightPathSegment.h"
 #include "PlanMasterController.h"
 #include "VideoManager.h"
+#include "PreFlightChecklist/PreFlightChecklistBridge.h"
 #include "VideoReceiver.h"
 #include "LogDownloadController.h"
 #include "SecondaryVideoManager.h"
@@ -536,6 +537,11 @@ void QGCApplication::_initCommon()
     qmlRegisterSingletonType<ScreenToolsController>     ("QGroundControl.ScreenToolsController",    1, 0, "ScreenToolsController",  screenToolsControllerSingletonFactory);
     qmlRegisterSingletonType<ShapeFileHelper>           ("QGroundControl.ShapeFileHelper",          1, 0, "ShapeFileHelper",        shapeFileHelperSingletonFactory);
     qmlRegisterSingletonType<ShapeFileHelper>           ("MAVLink",                                 1, 0, "MAVLink",                mavlinkSingletonFactory);
+
+    qmlRegisterSingletonType<PreFlightChecklistBridge>("PreFlightChecklist.Object", 1, 0, "PreFlightChecklist",
+                                                       [](QQmlEngine*, QJSEngine*)->QObject*{
+                                                           return PreFlightChecklistBridge::instance();
+                                                       });
 
     qmlRegisterSingletonType<SiYi>("SiYi.Object", 1, 0, "SiYi", [](QQmlEngine*, QJSEngine*)->QObject*{
         return SiYi::instance();
